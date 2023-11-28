@@ -14,6 +14,23 @@ const INITIAL_VIEW_STATE = {
   pitch: 0,
   bearing: 0,
 };
+
+const windData = [
+  {
+    longitude: 76.6206927900588,
+    latitude: 11.551920204973305,
+    windSpeed: 5, // in m/s
+    windDirection: 45, // in degrees from north
+  },
+  {
+    longitude: 76.6206927900588,
+    latitude: 11.551920204973305,
+    windSpeed: 10, // in m/s
+    windDirection: 90, // in degrees from north
+  },
+  // ... more data points
+];
+
 const getPolygon = (lat: number, lng: number, size: number) => [
   [lat - size * 0.5, lng - size * 0.5],
   [lat + size * 0.5, lng - size * 0.5],
@@ -56,12 +73,23 @@ function App() {
       })
     }
   });
+
+  const windLayer = new ScatterplotLayer({
+    id: 'wind-layer',
+    data: windData, // your wind data here
+    getPosition: d => [d.longitude, d.latitude],
+    getRadius: d => d.windSpeed * 1000,
+    getFillColor: d => [255, (d.windSpeed / maxWindSpeed) * 255, 0],
+    getAngle: d => d.windDirection,
+    pickable: true,
+  });
+  
   return (
     <div style={{ position: "relative", height: "100vh", width: "100vw" }}>
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        layers={[maskLayer, myLayer, myLayer2]}
+        layers={[maskLayer, myLayer, myLayer2, windLayer]}
         style={{ position: "absolute", height: "100%", width: "100%" }}
         onHover={(info) => {
           const coords = getPolygon(info.x, info.y, 150);
