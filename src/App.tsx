@@ -4,6 +4,7 @@ const MAPBOX_ACCESS_TOKEN =
 
 import { IconLayer } from '@deck.gl/layers/typed';
 import { useState } from "react";
+import rightArrow from "../src/assets/right arrow.png"
 
 const INITIAL_VIEW_STATE = {
   longitude: 76.6206927900588,
@@ -21,10 +22,28 @@ const windData = [
     windDirection: 45, // in degrees from north
   },
   {
-    longitude: 76.6206927900588,
-    latitude: 11.551920204973305,
+    longitude: 77.6216927900588,
+    latitude: 12.552920204973305,
     windSpeed: 10, // in m/s
     windDirection: 90, // in degrees from north
+  },
+  {
+    longitude: 78.6226927900588,
+    latitude: 13.553920204973305,
+    windSpeed: 15, // in m/s
+    windDirection: 135, // in degrees from north
+  },
+  {
+    longitude: 79.6236927900588,
+    latitude: 14.554920204973305,
+    windSpeed: 20, // in m/s
+    windDirection: 180, // in degrees from north
+  },
+  {
+    longitude: 80.6246927900588,
+    latitude: 15.555920204973305,
+    windSpeed: 25, // in m/s
+    windDirection: 225, // in degrees from north
   },
   // ... more data points
 ];
@@ -44,6 +63,7 @@ function App() {
     data: windData,
     pickable: true,
     iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+    //iconAtlas: rightArrow,  //This is how it is implemented on Aru-Client app. But here it's not working.
     iconMapping: {
       marker: {x: 0, y: 0, width: 128, height: 128, mask: true}, 
       marker2: {x: 128, y: 0, width: 128, height: 128, mask: true}, 
@@ -59,8 +79,9 @@ function App() {
         return 'marker3';
       }
     },
-    getSize: d => d.windSpeed,
+    getSize: d => d.windSpeed * 10,
     getColor: d => [255, (d.windSpeed / maxWindSpeed) * 255, 0],
+    getAngle: d => d.windDirection,
   });
   
   return (
