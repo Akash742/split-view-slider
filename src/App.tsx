@@ -72,16 +72,12 @@ function App() {
     getPosition: d => [d.longitude, d.latitude],
     getIcon: d => {
       return 'marker';
-      // if (d.windSpeed < 5) {
-      //   return 'marker';
-      // } else if (d.windSpeed < 10) {
-      //   return 'marker2';
-      // } else {
-      //   return 'marker3';
-      // }
     },
     getSize: d => d.windSpeed * 10,
-    getColor: d => [255, (d.windSpeed / maxWindSpeed) * 255, 0],
+    getColor: d => {
+      const t = d.windSpeed / maxWindSpeed;
+      return[ 255 * (1 - t), 255 * t, 0];
+    },
     getAngle: d => d.windDirection,
   });
   
