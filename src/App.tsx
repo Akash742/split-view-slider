@@ -54,7 +54,7 @@ const getPolygon = (lat: number, lng: number, size: number) => [
   [lat + size * 0.5, lng + size * 0.5],
   [lat - size * 0.5, lng + size * 0.5],
 ];
-const tileUrl = "https://cog-nk.kesowa.com/cog/tiles/{z}/{x}/{y}.png?url=http://172.17.0.1:5151/raster/246a6dd2-cb38-409a-bd57-d2ef82d30757.tif";
+// const tileUrl = "https://cog-nk.kesowa.com/cog/tiles/{z}/{x}/{y}.png?url=http://172.17.0.1:5151/raster/246a6dd2-cb38-409a-bd57-d2ef82d30757.tif";
 function App() {
   const maxWindSpeed = Math.max(...windData.map(d => d.windSpeed));
 
@@ -62,22 +62,23 @@ function App() {
     id: 'wind-layer',
     data: windData,
     pickable: true,
-    iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-    //iconAtlas: rightArrow,  //This is how it is implemented on Aru-Client app. But here it's not working.
+    // iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+    iconAtlas: rightArrow,  //This is how it is implemented on Aru-Client app. But here it's not working.
     iconMapping: {
-      marker: {x: 0, y: 0, width: 128, height: 128, mask: true}, 
-      marker2: {x: 128, y: 0, width: 128, height: 128, mask: true}, 
-      marker3: {x: 256, y: 0, width: 128, height: 128, mask: true}, 
+      marker: {x: 0, y: 0, width: 1024, height: 1024, mask: true}, 
+      // marker2: {x: 128, y: 0, width: 128, height: 128, mask: true}, 
+      // marker3: {x: 256, y: 0, width: 128, height: 128, mask: true}, 
     },
     getPosition: d => [d.longitude, d.latitude],
     getIcon: d => {
-      if (d.windSpeed < 5) {
-        return 'marker';
-      } else if (d.windSpeed < 10) {
-        return 'marker2';
-      } else {
-        return 'marker3';
-      }
+      return 'marker';
+      // if (d.windSpeed < 5) {
+      //   return 'marker';
+      // } else if (d.windSpeed < 10) {
+      //   return 'marker2';
+      // } else {
+      //   return 'marker3';
+      // }
     },
     getSize: d => d.windSpeed * 10,
     getColor: d => [255, (d.windSpeed / maxWindSpeed) * 255, 0],
