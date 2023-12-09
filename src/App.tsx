@@ -3,12 +3,12 @@ const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoibmVlbGR1dHRhMTkiLCJhIjoiY2tweG9mN3F4MThrNTJ4cDk0enVjcTN4dCJ9.uxa_h0rjqumTxFMI1QELKQ";
 
 import { IconLayer } from "@deck.gl/layers/typed";
-import { useState } from "react";
+import { MVTLayer } from "@deck.gl/geo-layers/typed";
 
 const INITIAL_VIEW_STATE = {
   longitude: 76.6206927900588,
   latitude: 11.551920204973305,
-  zoom: 13,
+  zoom: 8,
   pitch: 0,
   bearing: 0,
 };
@@ -18,7 +18,13 @@ const windData = [
     longitude: 76.6206927900588,
     latitude: 11.551920204973305,
     windSpeed: 5, // in m/s
-    windDirection: 45, // in degrees from north
+    windDirection: 390, // in degrees from north
+  },
+  {
+    longitude: 76.66062027900588,
+    latitude: 11.553920204973305,
+    windSpeed: 15, // in m/s
+    windDirection: 390, // in degrees from north
   },
   {
     longitude: 77.6216927900588,
@@ -79,14 +85,6 @@ function App() {
   const windLayer = new IconLayer({
     id: "wind-layer",
     data: windData,
-    pickable: true,
-    // iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
-    //iconAtlas: rightArrow,  //This is how it is implemented on Aru-Client app. But here it's not working.
-    iconMapping: {
-      marker: { x: 0, y: 0, width: 1024, height: 1024, mask: true },
-      // marker2: {x: 128, y: 0, width: 128, height: 128, mask: true},
-      // marker3: {x: 256, y: 0, width: 128, height: 128, mask: true},
-    },
     getPosition: (d) => [d.longitude, d.latitude],
     getIcon: (d, { index }) => {
       const t = d.windSpeed / maxWindSpeed;
@@ -98,19 +96,23 @@ function App() {
       };
      },
     getSize: (d) => d.windSpeed * 10,
-    getColor: (d) => {
-      const t = d.windSpeed / maxWindSpeed;
-      return [255 * (1 - t), 255 * t, 0];
-    },
-    getAngle: (d) => 360 - d.windDirection,
+    getAngle: (d) => 90 - d.windDirection,
   });
 
+  const mapLayer = new MVTLayer({
+    id: "map",
+    data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_ACCESS_TOKEN}`,
+    minZoom: 0,
+    maxZoom: 23,
+    getLineColor: [192, 192, 192],
+    getFillColor: [140, 170, 180],
+  });
   return (
     <div style={{ position: "relative", height: "100vh", width: "100vw" }}>
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        layers={[windLayer]}
+        layers={[mapLayer, windLayer]}
         style={{ position: "absolute", height: "100%", width: "100%" }}
         onHover={(info) => {
           const coords = getPolygon(info.x, info.y, 150);
