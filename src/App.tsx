@@ -23,14 +23,15 @@ const data = {
       },
       "geometry": {
         "coordinates": [
-          88.40961004948292,
-          22.621773563363192
+          76.6206927900588,
+          11.551920204973305
         ],
         "type": "Point"
       }
     }
   ]
-}
+};
+
 
 
 const getPolygon = (lat: number, lng: number, size: number) => [
