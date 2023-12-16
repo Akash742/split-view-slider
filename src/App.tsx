@@ -1,8 +1,8 @@
-import { useState } from "react";
 import DeckGL from "@deck.gl/react/typed";
 import { HeatmapLayer } from "@deck.gl/aggregation-layers/typed";
 import { MVTLayer } from "@deck.gl/geo-layers/typed";
-import { PickingInfo } from "@deck.gl/core/typed";
+import { TextLayer } from "@deck.gl/layers/typed"
+import { rgb } from "d3";
 
 const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoibmVlbGR1dHRhMTkiLCJhIjoiY2tweG9mN3F4MThrNTJ4cDk0enVjcTN4dCJ9.uxa_h0rjqumTxFMI1QELKQ";
@@ -21,7 +21,7 @@ const data = {
     {
       type: "Feature",
       properties: {
-        pollutionLevel: 10,
+        aqi: 10,
       },
       geometry: {
         coordinates: [76.6906927900588, 11.571920204973305],
@@ -31,7 +31,7 @@ const data = {
     {
       type: "Feature",
       properties: {
-        pollutionLevel: 20,
+        aqi: 20,
       },
       geometry: {
         coordinates: [76.8206927900588, 11.591920204973305],
@@ -41,7 +41,7 @@ const data = {
     {
       type: "Feature",
       properties: {
-        pollutionLevel: 30,
+        aqi: 30,
       },
       geometry: {
         coordinates: [76.7206927900588, 11.511920204973305],
@@ -52,48 +52,36 @@ const data = {
 };
 
 function App() {
-  const [hoveredObject, setHoveredObject] = useState<{
-    x: number | null;
-    y: number | null;
-    content: string | null;
-  }>({
-    x: null,
-    y: null,
-    content: null,
+  const textLayer = new TextLayer({
+    id: "textLayer",
+    data: data.features.map((feature) => ({
+      position: feature.geometry.coordinates,
+      text: `${feature.properties.aqi}`,
+    })),
+    getPosition: (d) => d.position,
+    getText: (d) => d.text,
+    getSize: 32,
+    getColor: [59, 43, 82],
+    pickable: true,
+    sizeScale: 2,
+    sizeMinPixels: 6,
+    sizeMaxPixels: 25,
+    getTextBorderColor: [225, 225, 225, 225],
+    getTextOutlineWidth: 2,
+    getTextOutlineColor: [225, 225, 225, 225],
   });
 
   const layer = new HeatmapLayer({
     id: "heatmapLayer",
     data: data.features.map((feature) => ({
       position: feature.geometry.coordinates,
-      weight: feature.properties.pollutionLevel,
+      weight: feature.properties.aqi,
     })),
     getPosition: (d) => d.position,
     getWeight: (d) => d.weight,
     aggregation: "SUM",
     pickable: true,
     pickingRadius: 20,
-    getTooltip: ({ object }: PickingInfo): string | null => {
-      console.log('getTooltip', object);
-      if (object) {
-        return `Pollution Level: ${object.weight}`;
-      }
-      return null;
-    },
-    onHover: ({ object, x, y }: PickingInfo): boolean => {
-      console.log('onHover' ,{ object, x, y });
-      if (object) {
-        setHoveredObject({
-          x,
-          y,
-          content: `Pollution Level: ${object.weight}`,
-        });
-        return true;
-      } else {
-        setHoveredObject({ x: null, y: null, content: null });
-        return false;
-      }
-    },
   });
 
   const mapLayer = new MVTLayer({
@@ -111,25 +99,9 @@ function App() {
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        layers={[mapLayer, layer]}
+        layers={[mapLayer, layer, textLayer]}
         style={{ position: "absolute", height: "100%", width: "100%" }}
       >
-        {hoveredObject?.content && (
-          <div
-            style={{
-              position: "absolute",
-              top: hoveredObject.y ? `${hoveredObject.y}px` : "auto",
-              left: hoveredObject.x ? `${hoveredObject.x}px` : "auto",
-              background: "white",
-              color: "black",
-              padding: "5px",
-              borderRadius: "3px",
-              boxShadow: "0 0 5px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            {hoveredObject.content}
-          </div>
-        )}
       </DeckGL>
     </div>
   );
